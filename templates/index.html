@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SEMrush Organic Overview URL Opener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #b19cd9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #9370db;
+        }
+        .description {
+            text-align: center;
+            margin: 20px auto;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #9370db;
+            color: #b19cd9;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #9370db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background-color: #8a2be2;
+        }
+        .url-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .url-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SEMrush Organic Overview URL Opener</h1>
+        
+        <div class="description">
+            This tool helps you quickly access multiple SEMrush Organic Overview reports. 
+            Simply enter your domains (separated by commas), and it will generate and open 
+            SEMrush URLs for all variations of each domain (both with and without 'www'). 
+            This ensures you don't miss any data due to different domain configurations.
+        </div>
+        
+        <textarea id="domainInput" placeholder="Enter domains separated by commas (e.g., example.com, site.com)"></textarea>
+        
+        <div class="actions">
+            <button onclick="updateDomains()">Generate URLs</button>
+            <button onclick="openURLs()">Open All URLs</button>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div id="urlListContainer">
+            <h2>Generated SEMrush URLs:</h2>
+            <ul class="url-list" id="urlList"></ul>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus(count) {
+            const status = document.getElementById('status');
+            status.textContent = `Number of domains to process: ${count}`;
+        }
+
+        function updateUrlList(urls) {
+            const list = document.getElementById('urlList');
+            list.innerHTML = '';
+            urls.forEach(url => {
+                const li = document.createElement('li');
+                li.textContent = url;
+                list.appendChild(li);
+            });
+        }
+
+        async function updateDomains() {
+            const input = document.getElementById('domainInput');
+            const domains = input.value;
+            
+            const response = await fetch('/update_domains', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({domains}),
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                updateStatus(data.count);
+                updateUrlList(data.generated_urls);
+            }
+        }
+
+        async function openURLs() {
+            await fetch('/open_urls', {
+                method: 'POST',
+            });
+        }
+    </script>
+</body>
+</html>
